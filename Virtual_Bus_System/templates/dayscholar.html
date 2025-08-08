@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <div class="contain">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bus Advance Payment</title>
+        <script>
+            async function fetchBusData() {
+                try {
+                    const response = await fetch('/get_bus_info');
+                    const busData = await response.json();
+                    populateDestinationOptions(busData);
+                    window.globalBusData = busData;
+                } catch (error) {
+                    console.error('Failed to fetch bus data:', error);
+                }
+            }
+    
+            function populateDestinationOptions(busData) {
+                const destinationSelect = document.getElementById("destinationSelect");
+                destinationSelect.innerHTML = "<option value=''>-- Select Destination --</option>";
+                Object.keys(busData).forEach(destination => {
+                    const option = document.createElement("option");
+                    option.value = destination;
+                    option.textContent = destination;
+                    destinationSelect.appendChild(option);
+                });
+    
+                destinationSelect.addEventListener("change", () => populateDropOffs(busData));
+            }
+    
+            function populateDropOffs(busData) {
+                const destination = document.getElementById("destinationSelect").value;
+                const dropOffSelect = document.getElementById("dropOffSelect");
+                dropOffSelect.innerHTML = "<option value=''>-- Select Drop-Off Location --</option>";
+    
+                if (destination && busData[destination]) {
+                    busData[destination].locations.forEach((loc, index) => {
+                        const option = document.createElement("option");
+                        option.value = index;
+                        option.textContent = loc;
+                        dropOffSelect.appendChild(option);
+                    });
+                }
+            }
+    
+            window.onload = fetchBusData;
+        </script>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <h1>Bus Advance Payment</h1>
+    <form action="/proceed_to_payment_dayscholar" method="post">
+        <label for="destinationSelect">Select Destination:</label>
+        <select id="destinationSelect" name="destination"></select>
+        <br>
+        <br>
+        <label for="dropOffSelect">Select Drop-Off Location:</label>
+        <select id="dropOffSelect" name="drop_off_location"></select>
+        <br>
+        <br>
+        <label for="duration">Select Duration:</label>
+        <select id="duration" name="duration">
+            <option value="3">3 Months</option>
+            <option value="6">6 Months</option>
+        </select>
+        <br>
+        <br>
+        <button type="submit">Proceed to Payment</button>
+    </form>
+</div>
+</body>
+</html>

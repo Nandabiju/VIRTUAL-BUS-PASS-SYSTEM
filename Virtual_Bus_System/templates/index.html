@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSET VIRTUAL BUS PASS</title>
+    <link rel="stylesheet" href="/static/sty.css" >
+</head>
+<body>
+    <div class="logo-container">  <img src="/static/logo1.png" alt="Your Logo" class="logo">
+    </div>
+    <h1>SSET VIRTUAL BUS PASS</h1>
+
+    <div class="button-container">  
+        <button id="adminButton">ADMIN</button>
+        <a href="{{ url_for('login') }}">
+            <button>STUDENT</button>
+        </a>
+        <button id="securityButton">SECURITY</button>
+    </div>
+    
+    <a href="{{ url_for('login', role='admin') }}">ADMIN LINK</a>
+    <script>
+        document.getElementById("adminButton").addEventListener("click", function() {
+        window.location.href = "{{ url_for('login',role='admin') }}";
+    });
+        document.getElementById("securityButton").addEventListener("click", function() {
+        window.location.href = "{{ url_for('security_qr_scanner') }}";
+    });
+    </script>
+
+</body>
+</html> 

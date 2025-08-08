@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment</title>
+    <link rel="stylesheet" href="/static/st.css">
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="contain">
+        <h2>Payment Details</h2>
+        <br>
+        <p><strong>Name:</strong> {{ session.get("full_name", "Not Available") }}</p>
+        <br>
+        <p><strong>Email:</strong> {{ session.get("email", "Not Available") }}</p>
+        <br>
+        <p><strong>Student Type:</strong> {{ session.get("student_type", "Not Available") }}</p>
+        <br>
+        <p><strong>Bus Name:</strong> {{ session.get("bus_name", "Not Available") }}</p>
+        <br>
+        {% if session.get("student_type") == "Hosteller" %}
+        <p><strong>Reach Date:</strong> {{ session.get("reach_date", "Not Available") }}</p>
+        {% else %}
+        <p><strong>Drop-Off Location:</strong> {{ session.get("drop_off", "Not Available") }}</p>
+        {% endif %}
+        <br>
+        <p><strong>Total Amount:</strong> ₹{{ session.get("total_amount", "Not Available") }}</p>
+        <br>
+
+        <!-- Pay Button -->
+        <button id="payBtn" onclick="payNow()">Pay</button>
+
+        <!-- Success Message -->
+        <p id="paymentMsg" style="display: none; color: green; font-weight: bold;">Payment Successful!</p>
+
+        <!-- QR Code Display (Initially Hidden) -->
+        <div id="qrContainer" style="display: none;">
+            <p><strong>Bus Pass QR Code:</strong></p>
+            <img id="qrImage" src="data:image/png;base64,{{ qr_code }}" alt="Bus Pass QR Code" 
+                 style="width: 200px; height: 200px; margin-top: 15px;">
+        </div>
+        
+        <!-- Print Receipt Button -->
+        <button id="receiptBtn" class="no-print" style="display: none;" onclick="printReceipt()">Print Receipt</button>
+
+        <br><br>
+        <a href="{{ url_for('logout') }}" class="no-print">Logout</a>
+
+        <script>
+            function payNow() {
+                alert("Payment Successful!");
+        
+                // Hide the Pay button permanently
+                document.getElementById("payBtn").style.display = "none";
+        
+                // Show the success message
+                document.getElementById("paymentMsg").style.display = "block";
+
+                fetch('/generate_bus_pass', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("qrImage").src = "data:image/png;base64," + data.qr_code;
+                        document.getElementById("qrContainer").style.display = "block"; // ✅ Show QR only after payment
+                        document.querySelector(".contain").style.height = "auto";
+                    } else {
+                        alert("QR Code Generation Failed: " + data.error);
+                    }
+                });
+
+                // Show the Print Receipt button
+                document.getElementById("receiptBtn").style.display = "block";
+            }
+        
+            function printReceipt() {
+                // Hide non-printable elements
+                document.getElementById("receiptBtn").style.display = "none";
+                document.getElementById("payBtn").style.display = "none";
+        
+                // Trigger the print dialog
+                window.print();
+
+                // Show only the Print button after printing (Pay button never comes back)
+                setTimeout(() => {
+                    document.getElementById("receiptBtn").style.display = "block"; 
+                }, 1000);
+            }
+        </script>
+    </div>
+</body>
+</html>

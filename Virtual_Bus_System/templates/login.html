@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Buss Pass System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome to Virtual Buss Pass Generator</h1>
+    <div class="cont">
+        <form action="{{ url_for('login',role=role) }}" method="POST" onsubmit="alert('Form submitted!');">
+            <label for="register_number"><h4>Register Number</h4></label>
+            <input type="text" name="register_number" required>
+            <br>
+            <label for="password"><h4>Password</h4></label>
+            <input type="password" name="password" required>
+            <br>
+            <br>
+            <button type="submit" class="btn-login"><h4>Login</h4></button>
+        </form>
+        <br>
+        {% if role != "admin" %}
+        <a href="{{ url_for('newuser') }}"><h5>New user? Register here.</h5></a>
+        {% endif %}
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

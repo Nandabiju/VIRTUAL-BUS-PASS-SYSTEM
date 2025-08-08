@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User Registration</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>New User Registration</h1>
+    <div class="container">
+        <form id="registration" action="/register" method="POST">
+        <br>
+        <label for="full_name"><h4>Full Name</h4></label>
+        <input  type="text" name="fullname" required>
+        <br>
+        <label for="register_number"><h4>Register Number</h4></label>
+        <input type="text" name="regno" required>
+        <br>
+        <label for="email"><h4>E-mail</h4></label>
+        <input type="email" name="email" required>
+        <br>
+        <label for="type"><h4>Student Type</h4></label>
+        <select id="sttype" name="sttype" required>
+            <option value="Day Scholar">Day Scholar</option>
+            <option value="Hosteller">Hosteller</option>
+        </select>
+        <br>
+        <label for="password"><h4>Password</h4></label>
+        <input type="password" name="password" required>
+        <br>
+        <label for="confirm-password"><h4>Confirm Password</h4></label>
+        <input type="password" name="confirm_password" required>
+        <br>
+        <br>
+        <button type="submit" class="btn-login"><h4>Register</h4></button>
+        <br>
+        <br>
+        </form>
+        <a href="/"><h5>Already have an account? Login</h5></a>
+        <br>
+        {% if error %}
+            <h5 style="color: rgb(77, 16, 16); text-align: center; margin-top: 10px;">{{ error }}</h5>
+        {% endif %}
+    </div>
+</body>
+</html>

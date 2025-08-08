@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hosteller Bus Booking</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<script>
+    function handleProceedToPayment() {
+        const selectedBus = document.querySelector('input[name="selected_bus"]:checked');
+        const reachDate = document.getElementById("reach_date").value;
+
+        if (!selectedBus) {
+            alert("Please select a bus before proceeding.");
+            return false;
+        }
+        if (!reachDate) {
+            alert("Please select your expected arrival date.");
+            return false;
+        }
+
+        const selectedBusId = selectedBus.value;
+
+        fetch('/proceed_to_payment_hosteller', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `selected_bus=${selectedBusId}&reach_date=${reachDate}`
+        })
+        .then(response => {
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Server returned non-JSON response.");
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.updated_seats !== undefined) {
+                const seatCell = document.querySelector(`#row-${selectedBusId} .available-seats`);
+                if (seatCell) seatCell.textContent = data.updated_seats;
+
+                selectedBus.checked = false;
+                window.location.href = "/payment";
+            } else {
+                alert(data.error || "Failed to update seats. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("An unexpected error occurred. Please check console logs.");
+        });
+
+        return false;
+    }
+</script>
+
+<body>
+    <div class="container">
+        <h2>Bus Booking</h2>
+        <br>
+        <br>
+        <label for="reach_date"><strong>Expected Arrival Date:</strong></label>
+        <input type="date" id="reach_date" name="reach_date" required>
+        <br><br>
+        <form id="busSelectionForm" action="/proceed_to_payment_hosteller" method="POST" onsubmit="return handleProceedToPayment()">
+            <table id="busTable">
+                <thead>
+                    <tr>
+                        <th>Bus ID</th>
+                        <th>Destination</th>
+                        <th>Total Seats</th>
+                        <th>Available Seats</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bus in buses %}
+                    <tr id="row-{{ bus[0] }}">
+                        <td>{{ bus[0] }}</td>
+                        <td>{{ bus[1] }}</td>
+                        <td>{{ bus[2] }}</td>
+                        <td class="available-seats">{{ bus[3] }}</td>
+                        <td>
+                            <input type="radio" name="selected_bus" value="{{ bus[0] }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" id="proceedBtn">Proceed to Payment</button>
+        </form>
+        <br>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</body>
+</html>

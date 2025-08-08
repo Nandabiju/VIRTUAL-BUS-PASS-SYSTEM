@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security QR Scanner</title>
+    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <style>
+        #preview {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border: 2px solid #000;
+        }
+    </style>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="contain">
+        <h2>QR Code Scanner</h2>
+        <video id="preview"></video>
+        <p id="scanResult">Scan a QR Code...</p>
+    </div>
+    <script>
+        let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+
+        scanner.addListener('scan', function(content) {
+            document.getElementById('scanResult').innerText = "Scanned: " + content;
+
+            // Send scanned data to the server for verification
+            fetch('/verify_qr_code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ qr_data: content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Error verifying QR Code!");
+            });
+        });
+
+        // Start scanner when the page loads
+        Instascan.Camera.getCameras().then(function(cameras) {
+            if (cameras.length > 0) {
+                scanner.start(cameras[0]);
+            } else {
+                alert("No cameras found.");
+            }
+        }).catch(function(e) {
+            console.error(e);
+        });
+    </script>
+</body>
+</html>

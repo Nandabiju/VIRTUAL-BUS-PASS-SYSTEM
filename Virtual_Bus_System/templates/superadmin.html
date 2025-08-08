@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        function showActionForm() {
+            var action = document.getElementById("actionSelect").value;
+
+            document.getElementById("addModeratorForm").style.display = "none";
+            document.getElementById("deleteModeratorForm").style.display = "none";
+            document.getElementById("viewAdminsTable").style.display = "none";
+
+            if (action === "add") {
+                document.getElementById("addModeratorForm").style.display = "block";
+            } else if (action === "delete") {
+                document.getElementById("deleteModeratorForm").style.display = "block";
+            } else if (action === "view") {
+                document.getElementById("viewAdminsTable").style.display = "block";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+    <h1>Welcome, Super Admin</h1>
+    <!-- ✅ Flash Messages Section -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+    <label for="actionSelect"><h3>Select Action:</h3></label>
+    <select id="actionSelect" onchange="showActionForm()">
+        <option value="">-- Choose an Action --</option>
+        <option value="add">Add a Moderator</option>
+        <option value="delete">Delete a Moderator</option>
+        <option value="view">View Super Admins & Moderators</option>
+    </select>
+
+    <div id="addModeratorForm" style="display: none;">
+        <br>
+        <br>
+        <h3>Add a new Moderator</h3>
+        <br>
+        <form action="{{ url_for('add_moderator') }}" method="POST">
+            <label>Moderator ID:</label>
+            <input type="text" name="admin_id" required>
+            <br>
+            <br>
+            <label>Full Name:</label>
+            <input type="text" name="full_name" required>
+            <br>
+            <br>
+            <label>Email:</label>
+            <input type="email" name="email" required>
+            <br>
+            <br>
+            <label>Password:</label>
+            <input type="password" name="password" required>
+            <br>
+            <br>
+            <button type="submit">Add Moderator</button>
+        </form>
+    </div>
+
+
+    <div id="deleteModeratorForm" style="display: none;">
+        <br>
+        <h3>Delete a Moderator</h3>
+        <br>
+        <form action="{{ url_for('delete_moderator') }}" method="POST">
+            <label>Moderator ID:</label>
+            <input type="text" name="admin_id" required>
+            <br>
+            <br>
+            <button type="submit">Delete Moderator</button>
+        </form>
+    </div>
+
+    <div id="viewAdminsTable" style="display: none;">
+        <br>
+        <h3>Super Admins & Moderators</h3>
+        <br>
+        {% if admins %}
+        <table>
+            <tr>
+                <th>Admin ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+            </tr>
+            {% for admin in admins %}
+            <tr>
+                <td>{{ admin[0] }}</td>
+                <td>{{ admin[1] }}</td>
+                <td>{{ admin[2] }}</td>
+                <td>{{ admin[3] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p>No Super Admins or Moderators found.</p>
+        {% endif %}
+    </div>    
+    <br>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+</body>
+</html>
